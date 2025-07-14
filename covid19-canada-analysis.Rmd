@@ -1,0 +1,76 @@
+---
+title: "COVID-19 Canada Analysis"
+author: "Liem Vu"
+date: "2025-07-14"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(lubridate)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+covid <- read_csv("covid_data.csv", show_col_types = FALSE)
+
+canada <- covid %>%
+  filter(country == "Canada", code == "CAN", continent == "North America") %>%
+  select(date, total_cases, new_cases, total_deaths, new_deaths,
+         people_vaccinated, people_fully_vaccinated, population)
+glimpse(canada)
+summary(canada)
+```
+
+1. Cases and Deaths
+```{r}
+canada_clean <- canada %>%
+  mutate(date = ymd(date)) %>%
+  drop_na(total_cases, total_deaths)
+
+ggplot(canada_clean, aes(x = date)) +
+  geom_line(aes(y = total_cases), color = "steelblue", linewidth = 1.2) +
+  geom_line(aes(y = total_deaths), color = "firebrick", linewidth = 1.2) +
+  labs(title = "Total COVID-19 Cases and Deaths in Canada",
+       x = "Date", y = "Count") +
+  theme_minimal()
+```
+
+Interpretation:
+This line chart shows the growth of cumulative cases and deaths in Canada. Deaths increase more slowly than cases, likely due to vaccination and better treatment.
+
+2. Vaccination Rate
+```{r}
+vaccine_data <- canada %>%
+  mutate(date = ymd(date)) %>%
+  drop_na(people_fully_vaccinated, population) %>%
+  mutate(vaccine_rate = people_fully_vaccinated / population * 100)
+
+ggplot(vaccine_data, aes(x = date, y = vaccine_rate)) +
+  geom_line(color = "darkgreen", linewidth = 1.2) +
+  labs(title = "Full Vaccination Rate Over Time (%)",
+       x = "Date", y = "Percent") +
+  theme_minimal()
+```
+
+Interpretation:
+The percentage of fully vaccinated people rose sharply from early 2021, reaching over 70% in the end of the year.
+
+3. Daily new cases and new deaths
+```{r}
+daily <- canada %>%
+  mutate(date = ymd(date)) %>%
+  drop_na(new_cases, new_deaths)
+
+ggplot(daily, aes(x = date)) +
+  geom_col(aes(y = new_cases), fill = "skyblue") +
+  geom_col(aes(y = -new_deaths), fill = "tomato") +
+  labs(title = "Daily New Cases (Blue) vs. Deaths (Red)",
+       x = "Date", y = "Count") +
+  theme_minimal()
+```
+
+Interpretation: 
+The gap between new cases and new deaths widened after vaccines were rolled out. Deaths lagged cases by 2–3 weeks.
