@@ -5,7 +5,7 @@ This project analyzes COVID-19 trends in Canada using publicly available data fr
 - Time-series visualizations using ggplot2
 - Power BI dashboard with interactive filters and visuals
 
-## Key Findings adn Insights
+## Key Findings and Insights
 
 - COVID-19 cases spiked in multiple waves, especially during 2021.
 - Deaths increased slower than cases due to vaccination and improved healthcare.
